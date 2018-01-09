@@ -57,6 +57,10 @@ height =
 
 type Msg
     = NoOp
+    | StartGame
+    | Tick
+    | MoveLeft
+    | MoveRight
 
 
 type alias Piece =
@@ -85,6 +89,21 @@ init =
     )
 
 
+moveDown : Piece -> Piece
+moveDown piece =
+    { piece | pos = piece.pos |> List.map (Tuple.mapFirst <| (+) 1) }
+
+
+moveLeft : Piece -> Piece
+moveLeft piece =
+    { piece | pos = piece.pos |> List.map (Tuple.mapSecond <| flip (-) 1) }
+
+
+moveRight : Piece -> Piece
+moveRight piece =
+    { piece | pos = piece.pos |> List.map (Tuple.mapSecond <| (+) 1) }
+
+
 emptyBoard : Board
 emptyBoard =
     Matrix.repeat height width Empty
@@ -95,6 +114,20 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
+
+        StartGame ->
+            ( { model | state = Running 0 }
+            , Cmd.none
+            )
+
+        Tick ->
+            ( { model | piece = moveDown model.piece }, Cmd.none )
+
+        MoveLeft ->
+            ( { model | piece = moveLeft model.piece }, Cmd.none )
+
+        MoveRight ->
+            ( { model | piece = moveRight model.piece }, Cmd.none )
 
 
 main : Program Never Model Msg
@@ -109,7 +142,39 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    case model.state of
+        NotStarted ->
+            Keyboard.downs startGameOnSpace
+
+        Running _ ->
+            Sub.batch
+                [ Time.every (Time.second * 0.5) (always Tick)
+                , Keyboard.downs moveLeftRight
+                ]
+
+        GameOver _ ->
+            Sub.none
+
+
+startGameOnSpace : Keyboard.KeyCode -> Msg
+startGameOnSpace keyCode =
+    if keyCode == 32 then
+        StartGame
+    else
+        NoOp
+
+
+moveLeftRight : Keyboard.KeyCode -> Msg
+moveLeftRight keyCode =
+    case keyCode of
+        37 ->
+            MoveLeft
+
+        39 ->
+            MoveRight
+
+        _ ->
+            NoOp
 
 
 composeBoard : Board -> Piece -> Board
