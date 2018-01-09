@@ -61,10 +61,10 @@ type Msg
 
 
 type alias Piece =
-    { -- absolute position of piece
-      pos : Pos
-    , -- relative position of blocks within piece
-      cells : List Pos
+    { -- cell type for this piece
+      cell : Cell
+    , --  position of blocks within piece
+      pos : List Pos
     }
 
 
@@ -72,8 +72,13 @@ init : ( Model, Cmd Msg )
 init =
     ( { board = emptyBoard
       , piece =
-            { pos = ( 0, width // 2 )
-            , cells = [ ( 0, 0 ), ( 1, 0 ), ( 2, 0 ), ( 3, 0 ) ]
+            { cell = Blue
+            , pos =
+                [ ( 1, width // 2 )
+                , ( 2, width // 2 )
+                , ( 3, width // 2 )
+                , ( 4, width // 2 )
+                ]
             }
       , state = NotStarted
       }
@@ -113,7 +118,10 @@ subscriptions model =
 
 composeBoard : Board -> Piece -> Board
 composeBoard board piece =
-    board
+    List.foldl
+        (\( row, col ) -> Matrix.set row col Blue)
+        board
+        piece.pos
 
 
 view : Model -> Html Msg
