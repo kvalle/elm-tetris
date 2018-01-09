@@ -57,7 +57,6 @@ height =
 
 type Msg
     = NoOp
-    | NewGame
 
 
 type alias Piece =
@@ -96,9 +95,6 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
-
-        NewGame ->
-            init
 
 
 main : Program Never Model Msg
@@ -166,19 +162,6 @@ view model =
             ]
         , div [ class "info" ]
             [ div [ class "title" ] [ text "Tetris" ]
-            , div [ class "new-game" ]
-                [ button
-                    [ onClick NewGame
-                    , disabled <|
-                        case model.state of
-                            GameOver _ ->
-                                False
-
-                            _ ->
-                                True
-                    ]
-                    [ text "new game" ]
-                ]
             , div [ class "status" ]
                 [ text <|
                     case model.state of
