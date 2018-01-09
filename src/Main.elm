@@ -9,6 +9,8 @@ import Color
 import Time exposing (Time)
 import Keyboard
 import List.Extra
+import Matrix exposing (Matrix)
+import Array
 
 
 type alias Model =
@@ -19,7 +21,13 @@ type alias Model =
 
 
 type alias Board =
-    List (List Cell)
+    Matrix Cell
+
+
+{-| Position as (col, row)
+-}
+type alias Pos =
+    ( Int, Int )
 
 
 type Cell
@@ -53,8 +61,10 @@ type Msg
 
 
 type alias Piece =
-    { pos : ( Int, Int )
-    , cells : List ( Int, Int )
+    { -- absolute position of piece
+      pos : Pos
+    , -- relative position of blocks within piece
+      cells : List Pos
     }
 
 
@@ -71,9 +81,9 @@ init =
     )
 
 
-emptyBoard : List (List Cell)
+emptyBoard : Board
 emptyBoard =
-    List.repeat height (List.repeat width Empty)
+    Matrix.repeat height width Empty
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -104,14 +114,6 @@ subscriptions model =
 composeBoard : Board -> Piece -> Board
 composeBoard board piece =
     board
-        |> List.Extra.setAt 4
-            ([ Blue, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty ])
-        |> List.Extra.setAt 5
-            ([ Blue, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty ])
-        |> List.Extra.setAt 6
-            ([ Blue, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty ])
-        |> List.Extra.setAt 7
-            ([ Blue, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty ])
 
 
 view : Model -> Html Msg
@@ -136,19 +138,17 @@ view model =
                     , toFloat <| (height - (row + (height // 2))) * pixelSize
                     )
 
+                board : List Collage.Form
                 board =
                     composeBoard model.board model.piece
-                        |> List.indexedMap
-                            (\row cells ->
-                                cells
-                                    |> List.indexedMap
-                                        (\col cell ->
-                                            Collage.square pixelSize
-                                                |> Collage.filled (cellColor cell)
-                                                |> Collage.move (toCanvasCoord row col)
-                                        )
+                        |> Matrix.toIndexedArray
+                        |> Array.toList
+                        |> List.map
+                            (\( ( row, col ), cell ) ->
+                                Collage.square pixelSize
+                                    |> Collage.filled (cellColor cell)
+                                    |> Collage.move (toCanvasCoord row col)
                             )
-                        |> List.concat
               in
                 board
                     |> Collage.collage
