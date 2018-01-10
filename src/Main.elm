@@ -118,6 +118,12 @@ init =
     )
 
 
+removeFullRows : Board -> Board
+removeFullRows board =
+    -- TODO
+    board
+
+
 emptyPiece : Piece
 emptyPiece =
     { color = Blue, pos = [] }
@@ -256,12 +262,18 @@ update msg model =
                     , Cmd.none
                     )
                 else
-                    ( { model
-                        | board = composeBoard model.board model.piece
-                        , piece = emptyPiece
-                      }
-                    , Random.generate NewPiece randomPiece
-                    )
+                    let
+                        newBoard =
+                            model.board
+                                |> addPiece model.piece
+                                |> removeFullRows
+                    in
+                        ( { model
+                            | board = newBoard
+                            , piece = emptyPiece
+                          }
+                        , Random.generate NewPiece randomPiece
+                        )
 
         Move direction ->
             ( { model
@@ -321,8 +333,8 @@ moveBrick keyCode =
             NoOp
 
 
-composeBoard : Board -> Piece -> Board
-composeBoard board piece =
+addPiece : Piece -> Board -> Board
+addPiece piece board =
     List.foldl
         (\pos -> Matrix.set pos.row pos.col <| Filled piece.color)
         board
@@ -365,7 +377,8 @@ view model =
 
                 board : List Collage.Form
                 board =
-                    composeBoard model.board model.piece
+                    model.board
+                        |> addPiece model.piece
                         |> Matrix.toIndexedArray
                         |> Array.toList
                         |> List.map
