@@ -65,8 +65,7 @@ type Msg
     = NoOp
     | StartGame
     | Tick
-    | MoveLeft
-    | MoveRight
+    | Move Direction
 
 
 type alias Piece =
@@ -175,16 +174,9 @@ update msg model =
             , Cmd.none
             )
 
-        MoveLeft ->
+        Move direction ->
             ( { model
-                | piece = moveIfPossible Left model.board model.piece
-              }
-            , Cmd.none
-            )
-
-        MoveRight ->
-            ( { model
-                | piece = moveIfPossible Right model.board model.piece
+                | piece = moveIfPossible direction model.board model.piece
               }
             , Cmd.none
             )
@@ -228,10 +220,13 @@ moveLeftRight : Keyboard.KeyCode -> Msg
 moveLeftRight keyCode =
     case keyCode of
         37 ->
-            MoveLeft
+            Move Left
 
         39 ->
-            MoveRight
+            Move Right
+
+        40 ->
+            Move Down
 
         _ ->
             NoOp
