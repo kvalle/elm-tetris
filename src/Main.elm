@@ -41,6 +41,12 @@ type GameState
     | GameOver Score
 
 
+type Direction
+    = Down
+    | Left
+    | Right
+
+
 type alias Score =
     Int
 
@@ -116,21 +122,6 @@ move direction piece =
         { piece | pos = piece.pos |> List.map fn }
 
 
-moveDown : Piece -> Piece
-moveDown piece =
-    { piece | pos = piece.pos |> List.map (mapRow <| (+) 1) }
-
-
-moveLeft : Piece -> Piece
-moveLeft piece =
-    { piece | pos = piece.pos |> List.map (mapCol <| flip (-) 1) }
-
-
-moveRight : Piece -> Piece
-moveRight piece =
-    { piece | pos = piece.pos |> List.map (mapCol <| (+) 1) }
-
-
 legal : Piece -> Board -> Bool
 legal piece board =
     let
@@ -144,7 +135,7 @@ legal piece board =
             List.all (\pos -> pos.row <= height) piece.pos
 
         collision =
-            List.any (\pos -> (Matrix.get pos.row pos.col board) /= Empty) piece.pos
+            List.any (\pos -> (Matrix.get pos.row pos.col board) /= Just Empty) piece.pos
     in
         insideLeftEdge && insideRightEdge && aboveBottom && not collision
 
@@ -166,12 +157,12 @@ update msg model =
             )
 
         Tick ->
-            ( { model | piece = moveDown model.piece }, Cmd.none )
+            ( { model | piece = move Down model.piece }, Cmd.none )
 
         MoveLeft ->
             let
                 movedPiece =
-                    moveLeft model.piece
+                    move Left model.piece
             in
                 ( if legal movedPiece model.board then
                     { model | piece = movedPiece }
@@ -183,7 +174,7 @@ update msg model =
         MoveRight ->
             let
                 movedPiece =
-                    moveRight model.piece
+                    move Right model.piece
             in
                 ( if legal movedPiece model.board then
                     { model | piece = movedPiece }
