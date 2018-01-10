@@ -293,7 +293,7 @@ view model =
                             "press SPACE to begin"
 
                         Running _ ->
-                            "⬅/➡ move, ⬆/⬇ rotate"
+                            "⬅/➡/⬇ move, ⬆ rotate"
 
                         GameOver _ ->
                             "game over"
