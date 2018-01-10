@@ -88,13 +88,16 @@ type Msg
     | Tick
     | Move Direction
     | NewPiece Piece
+    | Rotate
 
 
 type alias Piece =
     { -- cell type for this piece
       color : Color
-    , --  position of blocks within piece
-      pos : List Pos
+    , -- center position of piece
+      pos : Pos
+    , -- relative coordinates of blocks within piece
+      blocks : List ( Int, Int )
     }
 
 
@@ -135,7 +138,7 @@ clearFullRows board =
 
 emptyPiece : Piece
 emptyPiece =
-    { color = Blue, pos = [] }
+    { color = Blue, pos = Pos 0 0, blocks = [] }
 
 
 pieces : Nonempty Piece
@@ -143,42 +146,26 @@ pieces =
     let
         theLongStrightOne =
             { color = Red
-            , pos =
-                [ { row = 1, col = width // 2 }
-                , { row = 2, col = width // 2 }
-                , { row = 3, col = width // 2 }
-                , { row = 4, col = width // 2 }
-                ]
+            , pos = { row = 1, col = width // 2 }
+            , blocks = [ ( -1, 0 ), ( 0, 0 ), ( 1, 0 ), ( 2, 0 ) ]
             }
 
         theOneThatLooksLikeL =
             { color = Yellow
-            , pos =
-                [ { row = 1, col = width // 2 }
-                , { row = 2, col = width // 2 }
-                , { row = 3, col = width // 2 }
-                , { row = 3, col = (width // 2) + 1 }
-                ]
+            , pos = { row = 1, col = width // 2 }
+            , blocks = [ ( -1, 0 ), ( 0, 0 ), ( 1, 0 ), ( 1, 1 ) ]
             }
 
         theBackwardsL =
             { color = Blue
-            , pos =
-                [ { row = 1, col = width // 2 }
-                , { row = 2, col = width // 2 }
-                , { row = 3, col = width // 2 }
-                , { row = 3, col = (width // 2) - 1 }
-                ]
+            , pos = { row = 1, col = width // 2 }
+            , blocks = [ ( -1, 0 ), ( 0, 0 ), ( 1, 0 ), ( 1, -1 ) ]
             }
 
         thePyramidThing =
             { color = Green
-            , pos =
-                [ { row = 1, col = width // 2 }
-                , { row = 2, col = width // 2 }
-                , { row = 2, col = (width // 2) + 1 }
-                , { row = 3, col = width // 2 }
-                ]
+            , pos = { row = 1, col = width // 2 }
+            , blocks = [ ( -1, 0 ), ( 0, 0 ), ( 1, 1 ), ( 1, 0 ) ]
             }
     in
         Nonempty theLongStrightOne
@@ -209,7 +196,12 @@ move direction piece =
                 Right ->
                     mapCol <| (+) 1
     in
-        { piece | pos = piece.pos |> List.map fn }
+        { piece | pos = fn piece.pos }
+
+
+rotate : Piece -> Piece
+rotate piece =
+    piece
 
 
 getCell : Pos -> Board -> Maybe Cell
@@ -250,20 +242,28 @@ toPosList board =
             )
 
 
+positions : Piece -> List Pos
+positions piece =
+    piece.blocks
+        |> List.map (Tuple.mapFirst <| (+) piece.pos.row)
+        |> List.map (Tuple.mapSecond <| (+) piece.pos.col)
+        |> List.map (uncurry Pos)
+
+
 legal : Piece -> Board -> Bool
 legal piece board =
     let
         insideLeftEdge =
-            List.all (\pos -> pos.col >= 0) piece.pos
+            List.all (\pos -> pos.col >= 0) (positions piece)
 
         insideRightEdge =
-            List.all (\pos -> pos.col < width) piece.pos
+            List.all (\pos -> pos.col < width) (positions piece)
 
         aboveBottom =
-            List.all (\pos -> pos.row <= height) piece.pos
+            List.all (\pos -> pos.row <= height) (positions piece)
 
         collision =
-            List.any (\pos -> (getCell pos board) /= Just Empty) piece.pos
+            List.any (\pos -> (getCell pos board) /= Just Empty) (positions piece)
     in
         insideLeftEdge && insideRightEdge && aboveBottom && not collision
 
@@ -329,6 +329,9 @@ update msg model =
             , Cmd.none
             )
 
+        Rotate ->
+            ( { model | piece = rotate model.piece }, Cmd.none )
+
 
 main : Program Never Model Msg
 main =
@@ -385,7 +388,7 @@ addPiece piece board =
     List.foldl
         (\pos -> setCell pos <| Filled piece.color)
         board
-        piece.pos
+        (positions piece)
 
 
 view : Model -> Html Msg
