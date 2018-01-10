@@ -9,7 +9,8 @@ import Time exposing (Time)
 import Keyboard
 import Matrix exposing (Matrix)
 import Array
-import Task exposing (Task)
+import Random exposing (Generator)
+import List.Nonempty exposing (Nonempty(..))
 
 
 type alias Model =
@@ -36,6 +37,10 @@ type Cell
 
 type Color
     = Blue
+    | Yellow
+    | Red
+    | Green
+    | Purple
 
 
 type GameState
@@ -93,23 +98,11 @@ mapCol fn pos =
 init : ( Model, Cmd Msg )
 init =
     ( { board = emptyBoard
-      , piece = initPiece
+      , piece = emptyPiece
       , state = NotStarted
       }
-    , Cmd.none
+    , Random.generate NewPiece randomPiece
     )
-
-
-initPiece : Piece
-initPiece =
-    { cell = Filled Blue
-    , pos =
-        [ { row = 1, col = width // 2 }
-        , { row = 2, col = width // 2 }
-        , { row = 3, col = width // 2 }
-        , { row = 4, col = width // 2 }
-        ]
-    }
 
 
 emptyPiece : Piece
@@ -117,9 +110,47 @@ emptyPiece =
     { cell = Empty, pos = [] }
 
 
-nextPiece : Task Never Piece
-nextPiece =
-    Task.succeed initPiece
+pieces : Nonempty Piece
+pieces =
+    let
+        theLongStrightOne =
+            { cell = Filled Red
+            , pos =
+                [ { row = 1, col = width // 2 }
+                , { row = 2, col = width // 2 }
+                , { row = 3, col = width // 2 }
+                , { row = 4, col = width // 2 }
+                ]
+            }
+
+        theOneThatLooksLikeL =
+            { cell = Filled Yellow
+            , pos =
+                [ { row = 1, col = width // 2 }
+                , { row = 2, col = width // 2 }
+                , { row = 3, col = width // 2 }
+                , { row = 3, col = (width // 2) + 1 }
+                ]
+            }
+
+        theBackwardsL =
+            { cell = Filled Blue
+            , pos =
+                [ { row = 1, col = width // 2 }
+                , { row = 2, col = width // 2 }
+                , { row = 3, col = width // 2 }
+                , { row = 3, col = (width // 2) - 1 }
+                ]
+            }
+    in
+        Nonempty
+            theLongStrightOne
+            [ theOneThatLooksLikeL, theBackwardsL ]
+
+
+randomPiece : Generator Piece
+randomPiece =
+    List.Nonempty.sample pieces
 
 
 emptyBoard : Board
@@ -204,7 +235,7 @@ update msg model =
                         | board = composeBoard model.board model.piece
                         , piece = emptyPiece
                       }
-                    , Task.perform NewPiece nextPiece
+                    , Random.generate NewPiece randomPiece
                     )
 
         Move direction ->
@@ -288,6 +319,18 @@ view model =
 
                         Filled Blue ->
                             Color.blue
+
+                        Filled Red ->
+                            Color.red
+
+                        Filled Green ->
+                            Color.green
+
+                        Filled Yellow ->
+                            Color.yellow
+
+                        Filled Purple ->
+                            Color.purple
 
                 toCanvasCoord : Int -> Int -> ( Float, Float )
                 toCanvasCoord row col =
