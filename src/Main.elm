@@ -43,6 +43,19 @@ type Color
     | Purple
 
 
+score : GameState -> Int
+score gameState =
+    case gameState of
+        NotStarted ->
+            0
+
+        Running score ->
+            score
+
+        GameOver score ->
+            score
+
+
 type GameState
     = NotStarted
     | Running Score
@@ -226,7 +239,10 @@ update msg model =
             )
 
         NewPiece piece ->
-            ( { model | piece = piece }
+            ( if legal piece model.board then
+                { model | piece = piece }
+              else
+                { model | state = GameOver <| score model.state }
             , Cmd.none
             )
 
