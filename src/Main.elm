@@ -118,10 +118,19 @@ init =
     )
 
 
-removeFullRows : Board -> Board
-removeFullRows board =
-    -- TODO
-    board
+clearFullRows : Board -> Board
+clearFullRows board =
+    let
+        filteredRows =
+            Array.filter (Array.toList >> List.any ((==) Empty)) board
+
+        rowsRemoved =
+            Array.length board - Array.length filteredRows
+
+        replacementRows =
+            Array.repeat rowsRemoved (Array.repeat width Empty)
+    in
+        Array.append replacementRows filteredRows
 
 
 emptyPiece : Piece
@@ -304,7 +313,7 @@ update msg model =
                         newBoard =
                             model.board
                                 |> addPiece model.piece
-                                |> removeFullRows
+                                |> clearFullRows
                     in
                         ( { model
                             | board = newBoard
