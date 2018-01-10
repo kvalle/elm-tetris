@@ -419,7 +419,7 @@ view model =
                 toCanvasCoord : Int -> Int -> ( Float, Float )
                 toCanvasCoord row col =
                     ( toFloat <| (col - (width // 2)) * pixelSize
-                    , toFloat <| (height - (row + (height // 2))) * pixelSize
+                    , toFloat <| (height - 1 - (row + (height // 2))) * pixelSize
                     )
 
                 board : List Collage.Form
@@ -436,8 +436,8 @@ view model =
               in
                 board
                     |> Collage.collage
-                        (width * pixelSize + pixelSize // 2)
-                        (height * pixelSize + pixelSize // 2)
+                        (width * pixelSize - pixelSize // 2)
+                        (height * pixelSize - pixelSize // 2)
                     |> Element.toHtml
             ]
         , div [ class "info" ]
