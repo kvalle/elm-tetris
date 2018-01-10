@@ -7,10 +7,10 @@ import Element
 import Color
 import Time exposing (Time)
 import Keyboard
-import Matrix exposing (Matrix)
 import Array
 import Random exposing (Generator)
 import List.Nonempty exposing (Nonempty(..))
+import Array exposing (Array)
 
 
 type alias Model =
@@ -21,7 +21,7 @@ type alias Model =
 
 
 type alias Board =
-    Matrix Cell
+    Array (Array Cell)
 
 
 {-| Position as (col, row)
@@ -183,7 +183,7 @@ randomPiece =
 
 emptyBoard : Board
 emptyBoard =
-    Matrix.repeat height width Empty
+    Array.repeat height <| Array.repeat width Empty
 
 
 move : Direction -> Piece -> Piece
@@ -203,6 +203,44 @@ move direction piece =
         { piece | pos = piece.pos |> List.map fn }
 
 
+getCell : Pos -> Board -> Maybe Cell
+getCell pos board =
+    board
+        |> Array.get pos.row
+        |> Maybe.map (Array.get pos.col)
+        |> Maybe.withDefault Nothing
+
+
+setCell : Pos -> Cell -> Board -> Board
+setCell pos cell board =
+    let
+        maybeRow =
+            board
+                |> Array.get pos.row
+                |> Maybe.map (Array.set pos.col cell)
+    in
+        case maybeRow of
+            Just row ->
+                Array.set pos.row row board
+
+            Nothing ->
+                board
+
+
+toPosList : Board -> List ( Pos, Cell )
+toPosList board =
+    Array.map (Array.toIndexedList) board
+        |> Array.toIndexedList
+        |> List.concatMap
+            (\( row, cells ) ->
+                cells
+                    |> List.map
+                        (\( col, cell ) ->
+                            ( Pos row col, cell )
+                        )
+            )
+
+
 legal : Piece -> Board -> Bool
 legal piece board =
     let
@@ -216,7 +254,7 @@ legal piece board =
             List.all (\pos -> pos.row <= height) piece.pos
 
         collision =
-            List.any (\pos -> (Matrix.get pos.row pos.col board) /= Just Empty) piece.pos
+            List.any (\pos -> (getCell pos board) /= Just Empty) piece.pos
     in
         insideLeftEdge && insideRightEdge && aboveBottom && not collision
 
@@ -336,7 +374,7 @@ moveBrick keyCode =
 addPiece : Piece -> Board -> Board
 addPiece piece board =
     List.foldl
-        (\pos -> Matrix.set pos.row pos.col <| Filled piece.color)
+        (\pos -> setCell pos <| Filled piece.color)
         board
         piece.pos
 
@@ -379,13 +417,12 @@ view model =
                 board =
                     model.board
                         |> addPiece model.piece
-                        |> Matrix.toIndexedArray
-                        |> Array.toList
+                        |> toPosList
                         |> List.map
-                            (\( ( row, col ), cell ) ->
+                            (\( pos, cell ) ->
                                 Collage.square pixelSize
                                     |> Collage.filled (cellColor cell)
-                                    |> Collage.move (toCanvasCoord row col)
+                                    |> Collage.move (toCanvasCoord pos.row pos.col)
                             )
               in
                 board
