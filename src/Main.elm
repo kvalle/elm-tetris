@@ -27,7 +27,7 @@ type alias Board =
 {-| Position as (col, row)
 -}
 type alias Pos =
-    ( Int, Int )
+    { row : Int, col : Int }
 
 
 type Cell
@@ -71,16 +71,26 @@ type alias Piece =
     }
 
 
+mapRow : (Int -> Int) -> Pos -> Pos
+mapRow fn pos =
+    { pos | row = fn pos.row }
+
+
+mapCol : (Int -> Int) -> Pos -> Pos
+mapCol fn pos =
+    { pos | col = fn pos.col }
+
+
 init : ( Model, Cmd Msg )
 init =
     ( { board = emptyBoard
       , piece =
             { cell = Blue
             , pos =
-                [ ( 1, width // 2 )
-                , ( 2, width // 2 )
-                , ( 3, width // 2 )
-                , ( 4, width // 2 )
+                [ { row = 1, col = width // 2 }
+                , { row = 2, col = width // 2 }
+                , { row = 3, col = width // 2 }
+                , { row = 4, col = width // 2 }
                 ]
             }
       , state = NotStarted
@@ -89,19 +99,54 @@ init =
     )
 
 
+move : Direction -> Piece -> Piece
+move direction piece =
+    let
+        fn =
+            case direction of
+                Down ->
+                    mapRow <| (+) 1
+
+                Left ->
+                    mapCol <| flip (-) 1
+
+                Right ->
+                    mapCol <| (+) 1
+    in
+        { piece | pos = piece.pos |> List.map fn }
+
+
 moveDown : Piece -> Piece
 moveDown piece =
-    { piece | pos = piece.pos |> List.map (Tuple.mapFirst <| (+) 1) }
+    { piece | pos = piece.pos |> List.map (mapRow <| (+) 1) }
 
 
 moveLeft : Piece -> Piece
 moveLeft piece =
-    { piece | pos = piece.pos |> List.map (Tuple.mapSecond <| flip (-) 1) }
+    { piece | pos = piece.pos |> List.map (mapCol <| flip (-) 1) }
 
 
 moveRight : Piece -> Piece
 moveRight piece =
-    { piece | pos = piece.pos |> List.map (Tuple.mapSecond <| (+) 1) }
+    { piece | pos = piece.pos |> List.map (mapCol <| (+) 1) }
+
+
+legal : Piece -> Board -> Bool
+legal piece board =
+    let
+        insideLeftEdge =
+            List.all (\pos -> pos.col >= 0) piece.pos
+
+        insideRightEdge =
+            List.all (\pos -> pos.col < width) piece.pos
+
+        aboveBottom =
+            List.all (\pos -> pos.row <= height) piece.pos
+
+        collision =
+            List.any (\pos -> (Matrix.get pos.row pos.col board) /= Empty) piece.pos
+    in
+        insideLeftEdge && insideRightEdge && aboveBottom && not collision
 
 
 emptyBoard : Board
@@ -124,10 +169,28 @@ update msg model =
             ( { model | piece = moveDown model.piece }, Cmd.none )
 
         MoveLeft ->
-            ( { model | piece = moveLeft model.piece }, Cmd.none )
+            let
+                movedPiece =
+                    moveLeft model.piece
+            in
+                ( if legal movedPiece model.board then
+                    { model | piece = movedPiece }
+                  else
+                    model
+                , Cmd.none
+                )
 
         MoveRight ->
-            ( { model | piece = moveRight model.piece }, Cmd.none )
+            let
+                movedPiece =
+                    moveRight model.piece
+            in
+                ( if legal movedPiece model.board then
+                    { model | piece = movedPiece }
+                  else
+                    model
+                , Cmd.none
+                )
 
 
 main : Program Never Model Msg
@@ -180,7 +243,7 @@ moveLeftRight keyCode =
 composeBoard : Board -> Piece -> Board
 composeBoard board piece =
     List.foldl
-        (\( row, col ) -> Matrix.set row col Blue)
+        (\pos -> Matrix.set pos.row pos.col Blue)
         board
         piece.pos
 
