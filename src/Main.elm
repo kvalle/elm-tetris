@@ -142,10 +142,19 @@ pieces =
                 , { row = 3, col = (width // 2) - 1 }
                 ]
             }
+
+        thePyramidThing =
+            { color = Green
+            , pos =
+                [ { row = 1, col = width // 2 }
+                , { row = 2, col = width // 2 }
+                , { row = 2, col = (width // 2) + 1 }
+                , { row = 3, col = width // 2 }
+                ]
+            }
     in
-        Nonempty
-            theLongStrightOne
-            [ theOneThatLooksLikeL, theBackwardsL ]
+        Nonempty theLongStrightOne
+            [ theOneThatLooksLikeL, theBackwardsL, thePyramidThing ]
 
 
 randomPiece : Generator Piece
