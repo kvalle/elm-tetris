@@ -201,7 +201,9 @@ move direction piece =
 
 rotate : Piece -> Piece
 rotate piece =
-    piece
+    { piece
+        | blocks = piece.blocks |> List.map (\( row, col ) -> ( -col, row ))
+    }
 
 
 getCell : Pos -> Board -> Maybe Cell
@@ -353,6 +355,7 @@ subscriptions model =
             Sub.batch
                 [ Time.every (Time.second * 0.5) (always Tick)
                 , Keyboard.downs moveBrick
+                , Keyboard.downs rotateBrick
                 ]
 
         GameOver _ ->
@@ -378,6 +381,16 @@ moveBrick keyCode =
 
         40 ->
             Move Down
+
+        _ ->
+            NoOp
+
+
+rotateBrick : Keyboard.KeyCode -> Msg
+rotateBrick keyCode =
+    case keyCode of
+        38 ->
+            Rotate
 
         _ ->
             NoOp
