@@ -56,12 +56,12 @@ type alias Score =
 
 width : number
 width =
-    50
+    15
 
 
 height : number
 height =
-    50
+    15
 
 
 type Msg
@@ -279,7 +279,7 @@ view model =
         [ div [ class "board" ]
             [ let
                 pixelSize =
-                    10
+                    30
 
                 cellColor cell =
                     case cell of
