@@ -32,7 +32,11 @@ type alias Pos =
 
 type Cell
     = Empty
-    | Blue
+    | Filled Color
+
+
+type Color
+    = Blue
 
 
 type GameState
@@ -90,7 +94,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { board = emptyBoard
       , piece =
-            { cell = Blue
+            { cell = Filled Blue
             , pos =
                 [ { row = 1, col = width // 2 }
                 , { row = 2, col = width // 2 }
@@ -235,7 +239,7 @@ moveLeftRight keyCode =
 composeBoard : Board -> Piece -> Board
 composeBoard board piece =
     List.foldl
-        (\pos -> Matrix.set pos.row pos.col Blue)
+        (\pos -> Matrix.set pos.row pos.col <| Filled Blue)
         board
         piece.pos
 
@@ -253,7 +257,7 @@ view model =
                         Empty ->
                             Color.white
 
-                        Blue ->
+                        Filled Blue ->
                             Color.blue
 
                 toCanvasCoord : Int -> Int -> ( Float, Float )
