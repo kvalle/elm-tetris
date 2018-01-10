@@ -2,15 +2,14 @@ module Main exposing (main)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
 import Collage exposing (defaultLine)
 import Element
 import Color
 import Time exposing (Time)
 import Keyboard
-import List.Extra
 import Matrix exposing (Matrix)
 import Array
+import Task exposing (Task)
 
 
 type alias Model =
@@ -70,6 +69,7 @@ type Msg
     | StartGame
     | Tick
     | Move Direction
+    | NewPiece Piece
 
 
 type alias Piece =
@@ -93,19 +93,38 @@ mapCol fn pos =
 init : ( Model, Cmd Msg )
 init =
     ( { board = emptyBoard
-      , piece =
-            { cell = Filled Blue
-            , pos =
-                [ { row = 1, col = width // 2 }
-                , { row = 2, col = width // 2 }
-                , { row = 3, col = width // 2 }
-                , { row = 4, col = width // 2 }
-                ]
-            }
+      , piece = initPiece
       , state = NotStarted
       }
     , Cmd.none
     )
+
+
+initPiece : Piece
+initPiece =
+    { cell = Filled Blue
+    , pos =
+        [ { row = 1, col = width // 2 }
+        , { row = 2, col = width // 2 }
+        , { row = 3, col = width // 2 }
+        , { row = 4, col = width // 2 }
+        ]
+    }
+
+
+emptyPiece : Piece
+emptyPiece =
+    { cell = Empty, pos = [] }
+
+
+nextPiece : Task Never Piece
+nextPiece =
+    Task.succeed initPiece
+
+
+emptyBoard : Board
+emptyBoard =
+    Matrix.repeat height width Empty
 
 
 move : Direction -> Piece -> Piece
@@ -143,11 +162,6 @@ legal piece board =
         insideLeftEdge && insideRightEdge && aboveBottom && not collision
 
 
-emptyBoard : Board
-emptyBoard =
-    Matrix.repeat height width Empty
-
-
 moveIfPossible : Direction -> Board -> Piece -> Piece
 moveIfPossible direction board piece =
     let
@@ -171,12 +185,27 @@ update msg model =
             , Cmd.none
             )
 
-        Tick ->
-            ( { model
-                | piece = moveIfPossible Down model.board model.piece
-              }
+        NewPiece piece ->
+            ( { model | piece = piece }
             , Cmd.none
             )
+
+        Tick ->
+            let
+                movedPiece =
+                    move Down model.piece
+            in
+                if legal movedPiece model.board then
+                    ( { model | piece = movedPiece }
+                    , Cmd.none
+                    )
+                else
+                    ( { model
+                        | board = composeBoard model.board model.piece
+                        , piece = emptyPiece
+                      }
+                    , Task.perform NewPiece nextPiece
+                    )
 
         Move direction ->
             ( { model
@@ -205,7 +234,7 @@ subscriptions model =
         Running _ ->
             Sub.batch
                 [ Time.every (Time.second * 0.5) (always Tick)
-                , Keyboard.downs moveLeftRight
+                , Keyboard.downs moveBrick
                 ]
 
         GameOver _ ->
@@ -220,8 +249,8 @@ startGameOnSpace keyCode =
         NoOp
 
 
-moveLeftRight : Keyboard.KeyCode -> Msg
-moveLeftRight keyCode =
+moveBrick : Keyboard.KeyCode -> Msg
+moveBrick keyCode =
     case keyCode of
         37 ->
             Move Left
