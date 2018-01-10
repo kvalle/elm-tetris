@@ -145,6 +145,18 @@ emptyBoard =
     Matrix.repeat height width Empty
 
 
+moveIfPossible : Direction -> Board -> Piece -> Piece
+moveIfPossible direction board piece =
+    let
+        movedPiece =
+            move direction piece
+    in
+        if legal movedPiece board then
+            movedPiece
+        else
+            piece
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -157,31 +169,25 @@ update msg model =
             )
 
         Tick ->
-            ( { model | piece = move Down model.piece }, Cmd.none )
+            ( { model
+                | piece = moveIfPossible Down model.board model.piece
+              }
+            , Cmd.none
+            )
 
         MoveLeft ->
-            let
-                movedPiece =
-                    move Left model.piece
-            in
-                ( if legal movedPiece model.board then
-                    { model | piece = movedPiece }
-                  else
-                    model
-                , Cmd.none
-                )
+            ( { model
+                | piece = moveIfPossible Left model.board model.piece
+              }
+            , Cmd.none
+            )
 
         MoveRight ->
-            let
-                movedPiece =
-                    move Right model.piece
-            in
-                ( if legal movedPiece model.board then
-                    { model | piece = movedPiece }
-                  else
-                    model
-                , Cmd.none
-                )
+            ( { model
+                | piece = moveIfPossible Right model.board model.piece
+              }
+            , Cmd.none
+            )
 
 
 main : Program Never Model Msg
