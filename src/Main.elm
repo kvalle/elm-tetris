@@ -79,7 +79,7 @@ type Msg
 
 type alias Piece =
     { -- cell type for this piece
-      cell : Cell
+      color : Color
     , --  position of blocks within piece
       pos : List Pos
     }
@@ -107,14 +107,14 @@ init =
 
 emptyPiece : Piece
 emptyPiece =
-    { cell = Empty, pos = [] }
+    { color = Blue, pos = [] }
 
 
 pieces : Nonempty Piece
 pieces =
     let
         theLongStrightOne =
-            { cell = Filled Red
+            { color = Red
             , pos =
                 [ { row = 1, col = width // 2 }
                 , { row = 2, col = width // 2 }
@@ -124,7 +124,7 @@ pieces =
             }
 
         theOneThatLooksLikeL =
-            { cell = Filled Yellow
+            { color = Yellow
             , pos =
                 [ { row = 1, col = width // 2 }
                 , { row = 2, col = width // 2 }
@@ -134,7 +134,7 @@ pieces =
             }
 
         theBackwardsL =
-            { cell = Filled Blue
+            { color = Blue
             , pos =
                 [ { row = 1, col = width // 2 }
                 , { row = 2, col = width // 2 }
@@ -299,7 +299,7 @@ moveBrick keyCode =
 composeBoard : Board -> Piece -> Board
 composeBoard board piece =
     List.foldl
-        (\pos -> Matrix.set pos.row pos.col <| Filled Blue)
+        (\pos -> Matrix.set pos.row pos.col <| Filled piece.color)
         board
         piece.pos
 
