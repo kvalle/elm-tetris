@@ -1,15 +1,16 @@
 module View exposing (view)
 
+import Collage exposing (defaultLine)
+import Color
+import Config
+import Element
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Collage exposing (defaultLine)
-import Element
-import Color
 import Model exposing (Model)
-import Config
+import Types.Board as Board exposing (Board, Cell(..))
 import Types.Common exposing (Color(..))
 import Types.GameState as GameState exposing (GameState(..))
-import Types.Board as Board exposing (Board, Cell(..))
+import Types.Piece as Piece exposing (Piece)
 import Types.Pos as Pos exposing (Pos)
 
 
@@ -24,10 +25,13 @@ view model =
             [ div [ class "title" ]
                 [ text "Tetris" ]
             , div [ class "info-item status" ]
-                [ text <| "score: " ++ toString (GameState.score model.state)
-                , br [] []
-                , text <| "speed: " ++ toString model.speed
-                ]
+                [ text <| "score: " ++ toString (GameState.score model.state) ]
+            , div [ class "info-item status" ]
+                [ text <| "speed: " ++ toString model.speed ]
+            , div [ class "info-item status" ]
+                [ text "next piece: " ]
+            , div [ class "info-item status" ]
+                [ nextPieceCanvas model.nextPiece ]
             , div [ class "info-item controls" ]
                 [ text "move: ⬅/➡/⬇"
                 , br [] []
@@ -62,6 +66,25 @@ tetrisCanvas model =
             (Config.width * Config.pixelSize - Config.pixelSize // 2)
             (Config.height * Config.pixelSize - Config.pixelSize // 2)
         |> Element.toHtml
+
+
+nextPieceCanvas : Piece -> Html msg
+nextPieceCanvas piece =
+    let
+        renderBlock ( rowOffset, colOffset ) =
+            Collage.square Config.pixelSize
+                |> Collage.filled (cellColor <| Filled piece.color)
+                |> Collage.move
+                    ( toFloat colOffset * Config.pixelSize
+                    , toFloat rowOffset * Config.pixelSize
+                    )
+    in
+        piece.blocks
+            |> List.map renderBlock
+            |> Collage.collage
+                (Config.pixelSize * 4)
+                (Config.pixelSize * 4)
+            |> Element.toHtml
 
 
 renderBoard : Model -> List Collage.Form

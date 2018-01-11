@@ -36,9 +36,14 @@ update msg model =
 
         NewPiece piece ->
             ( if piece |> legalOn model.board then
-                { model | currentPiece = piece }
+                { model
+                    | currentPiece = model.nextPiece
+                    , nextPiece = piece
+                }
               else
-                { model | state = GameOver <| GameState.score model.state }
+                { model
+                    | state = GameOver <| GameState.score model.state
+                }
             , Cmd.none
             )
 
