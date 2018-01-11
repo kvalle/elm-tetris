@@ -24,7 +24,7 @@ update msg model =
             )
 
         NewPiece piece ->
-            ( if legal piece model.board then
+            ( if piece |> legalOn model.board then
                 { model | piece = piece }
               else
                 { model | state = GameOver <| Model.score model }
@@ -36,7 +36,7 @@ update msg model =
                 movedPiece =
                     Piece.move Down model.piece
             in
-                if legal movedPiece model.board then
+                if movedPiece |> legalOn model.board then
                     ( { model | piece = movedPiece }
                     , Cmd.none
                     )
@@ -63,11 +63,13 @@ update msg model =
             )
 
         Rotate ->
-            ( { model | piece = Piece.rotate model.piece }, Cmd.none )
+            ( { model | piece = rotateWherePossible model.board model.piece }
+            , Cmd.none
+            )
 
 
-legal : Piece -> Board -> Bool
-legal piece board =
+legalOn : Board -> Piece -> Bool
+legalOn board piece =
     let
         insideLeftEdge =
             List.all (\pos -> pos.col >= 0) (Piece.positions piece)
@@ -90,7 +92,28 @@ moveIfPossible direction board piece =
         movedPiece =
             Piece.move direction piece
     in
-        if legal movedPiece board then
+        if movedPiece |> legalOn board then
             movedPiece
         else
             piece
+
+
+{-| If the piece can be legally rotated at its current positions, or at any
+space adjacent position up to two spaces away, perform rotation. Otherwise
+return piece as is.
+-}
+rotateWherePossible : Board -> Piece -> Piece
+rotateWherePossible board piece =
+    let
+        possiblePositions =
+            [ piece |> Piece.rotate
+            , piece |> Piece.move Left |> Piece.rotate
+            , piece |> Piece.move Right |> Piece.rotate
+            , piece |> Piece.move Left |> Piece.move Left |> Piece.rotate
+            , piece |> Piece.move Right |> Piece.move Right |> Piece.rotate
+            ]
+    in
+        possiblePositions
+            |> List.filter (legalOn board)
+            |> List.head
+            |> Maybe.withDefault piece
