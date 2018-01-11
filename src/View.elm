@@ -20,10 +20,14 @@ view model =
             , overlay model.state
             ]
         , div [ class "info" ]
-            [ div [ class "title" ] [ text "Tetris" ]
-            , div [ class "status" ]
-                [ p [] [ text <| "score: " ++ toString (Model.score model) ]
-                , text "⬅/➡/⬇ move, ⬆ rotate"
+            [ div [ class "title" ]
+                [ text "Tetris" ]
+            , div [ class "info-item status" ]
+                [ text <| "score: " ++ toString (Model.score model) ]
+            , div [ class "info-item controls" ]
+                [ text "move: ⬅/➡/⬇"
+                , br [] []
+                , text "rotate: ⬆"
                 ]
             ]
         ]
