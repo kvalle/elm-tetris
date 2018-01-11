@@ -4,6 +4,7 @@ import Config
 import Types.Common exposing (..)
 import Types.Board as Board exposing (Board, Cell(..))
 import Types.Piece as Piece exposing (Piece)
+import Types.GameState as GameState exposing (GameState(..))
 import Messages exposing (Msg(..))
 import Model exposing (Model)
 import Random
@@ -27,7 +28,7 @@ update msg model =
             ( if piece |> legalOn model.board then
                 { model | piece = piece }
               else
-                { model | state = GameOver <| Model.score model }
+                { model | state = GameOver <| GameState.score model.state }
             , Cmd.none
             )
 
@@ -50,7 +51,7 @@ update msg model =
                         ( { model
                             | board = newBoard
                             , piece = Piece.empty
-                            , state = model.state |> Model.addPoints (numClearedRows * numClearedRows)
+                            , state = model.state |> GameState.addPoints (numClearedRows * numClearedRows)
                           }
                         , Random.generate NewPiece Piece.random
                         )

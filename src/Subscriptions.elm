@@ -2,7 +2,8 @@ module Subscriptions exposing (subscriptions)
 
 import Model exposing (Model)
 import Messages exposing (Msg(..))
-import Types.Common exposing (GameState(..), Direction(..))
+import Types.Common exposing (Direction(..))
+import Types.GameState exposing (GameState(..))
 import Keyboard
 import Time
 

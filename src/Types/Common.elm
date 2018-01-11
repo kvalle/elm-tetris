@@ -1,14 +1,4 @@
-module Types.Common exposing (GameState(..), Direction(..), Color(..))
-
-
-type GameState
-    = NotStarted
-    | Running Score
-    | GameOver Score
-
-
-type alias Score =
-    Int
+module Types.Common exposing (Direction(..), Color(..))
 
 
 type Direction

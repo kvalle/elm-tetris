@@ -7,7 +7,8 @@ import Element
 import Color
 import Model exposing (Model)
 import Config
-import Types.Common exposing (Color(..), GameState(..))
+import Types.Common exposing (Color(..))
+import Types.GameState as GameState exposing (GameState(..))
 import Types.Board as Board exposing (Board, Cell(..))
 import Types.Pos as Pos exposing (Pos)
 
@@ -23,7 +24,7 @@ view model =
             [ div [ class "title" ]
                 [ text "Tetris" ]
             , div [ class "info-item status" ]
-                [ text <| "score: " ++ toString (Model.score model) ]
+                [ text <| "score: " ++ toString (GameState.score model.state) ]
             , div [ class "info-item controls" ]
                 [ text "move: ⬅/➡/⬇"
                 , br [] []
