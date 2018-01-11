@@ -13,7 +13,7 @@ width =
 
 height : number
 height =
-    15
+    25
 
 
 pixelSize : number

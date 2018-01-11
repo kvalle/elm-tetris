@@ -16,23 +16,34 @@ view : Model -> Html msg
 view model =
     div [ class "game" ]
         [ div [ class "board" ]
-            [ tetrisCanvas model ]
+            [ tetrisCanvas model
+            , overlay model.state
+            ]
         , div [ class "info" ]
             [ div [ class "title" ] [ text "Tetris" ]
             , div [ class "status" ]
-                [ text <|
-                    case model.state of
-                        NotStarted ->
-                            "press SPACE to begin"
-
-                        Running _ ->
-                            "⬅/➡/⬇ move, ⬆ rotate"
-
-                        GameOver _ ->
-                            "game over"
+                [ p [] [ text <| "score: " ++ toString (Model.score model) ]
+                , text "⬅/➡/⬇ move, ⬆ rotate"
                 ]
             ]
         ]
+
+
+overlay : GameState -> Html msg
+overlay state =
+    case state of
+        NotStarted ->
+            div [ class "board-overlay" ]
+                [ text "press SPACE to begin" ]
+
+        GameOver _ ->
+            div [ class "board-overlay" ]
+                [ h1 [] [ text "GAME OVER" ]
+                , text "press SPACE for new game"
+                ]
+
+        Running _ ->
+            text ""
 
 
 tetrisCanvas : Model -> Html msg
