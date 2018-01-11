@@ -1,6 +1,5 @@
 module Model exposing (..)
 
-import Random exposing (Generator)
 import Messages exposing (Msg(..))
 import Types.Board as Board exposing (Board)
 import Types.Piece as Piece exposing (Piece)
@@ -20,7 +19,7 @@ init =
       , piece = Piece.empty
       , state = NotStarted
       }
-    , Random.generate NewPiece Piece.random
+    , Cmd.none
     )
 
 
