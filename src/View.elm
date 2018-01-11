@@ -80,7 +80,7 @@ nextPieceCanvas piece =
                 |> Collage.filled (cellColor <| Filled piece.color)
                 |> Collage.move
                     ( toFloat colOffset * Config.pixelSize
-                    , toFloat rowOffset * Config.pixelSize
+                    , toFloat rowOffset * Config.pixelSize * -1
                     )
     in
         piece.blocks
