@@ -16,8 +16,11 @@ update msg model =
             ( model, Cmd.none )
 
         StartGame ->
-            ( { model | state = Running 0 }
-            , Cmd.none
+            ( { model
+                | state = Running 0
+                , board = Board.empty
+              }
+            , Random.generate NewPiece Piece.random
             )
 
         NewPiece piece ->

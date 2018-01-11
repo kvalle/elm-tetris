@@ -21,7 +21,7 @@ subscriptions model =
                 ]
 
         GameOver _ ->
-            Sub.none
+            Keyboard.downs startGameOnSpace
 
 
 startGameOnSpace : Keyboard.KeyCode -> Msg
