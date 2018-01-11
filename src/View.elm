@@ -29,7 +29,11 @@ view model =
             , div [ class "info-item status" ]
                 [ text <| "speed: " ++ toString model.speed ]
             , div [ class "info-item status" ]
-                [ text "next piece: " ]
+                [ if not <| Piece.isEmpty model.nextPiece then
+                    text "next piece: "
+                  else
+                    text ""
+                ]
             , div [ class "info-item status" ]
                 [ nextPieceCanvas model.nextPiece ]
             , div [ class "info-item controls" ]

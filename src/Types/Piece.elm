@@ -1,4 +1,4 @@
-module Types.Piece exposing (Piece, empty, positions, random, move, rotate)
+module Types.Piece exposing (Piece, empty, isEmpty, positions, random, move, rotate)
 
 import Random exposing (Generator)
 import List.Nonempty exposing (Nonempty(..))
@@ -20,6 +20,11 @@ type alias Piece =
 empty : Piece
 empty =
     { color = Blue, pos = Pos 0 0, blocks = [] }
+
+
+isEmpty : Piece -> Bool
+isEmpty piece =
+    piece.blocks == []
 
 
 positions : Piece -> List Pos
