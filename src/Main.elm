@@ -165,7 +165,7 @@ pieces =
         thePyramidThing =
             { color = Green
             , pos = { row = 1, col = width // 2 }
-            , blocks = [ ( -1, 0 ), ( 0, 0 ), ( 1, 1 ), ( 1, 0 ) ]
+            , blocks = [ ( -1, 0 ), ( 0, 0 ), ( 0, 1 ), ( 1, 0 ) ]
             }
     in
         Nonempty theLongStrightOne
