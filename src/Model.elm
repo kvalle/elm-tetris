@@ -35,3 +35,16 @@ score model =
 
         GameOver score ->
             score
+
+
+addPoints : Int -> GameState -> GameState
+addPoints n state =
+    case state of
+        NotStarted ->
+            NotStarted
+
+        Running score ->
+            Running <| score + n
+
+        GameOver score ->
+            GameOver <| score + n

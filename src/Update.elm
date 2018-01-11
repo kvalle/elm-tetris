@@ -39,7 +39,7 @@ update msg model =
                     )
                 else
                     let
-                        newBoard =
+                        ( newBoard, numClearedRows ) =
                             model.board
                                 |> Board.addPiece model.piece
                                 |> Board.clearFullRows
@@ -47,6 +47,7 @@ update msg model =
                         ( { model
                             | board = newBoard
                             , piece = Piece.empty
+                            , state = model.state |> Model.addPoints (numClearedRows * numClearedRows)
                           }
                         , Random.generate NewPiece Piece.random
                         )

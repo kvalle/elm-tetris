@@ -30,7 +30,7 @@ empty =
     Array.repeat Config.height <| Array.repeat Config.width Empty
 
 
-clearFullRows : Board -> Board
+clearFullRows : Board -> ( Board, Int )
 clearFullRows board =
     let
         filteredRows =
@@ -42,7 +42,9 @@ clearFullRows board =
         replacementRows =
             Array.repeat rowsRemoved (Array.repeat Config.width Empty)
     in
-        Array.append replacementRows filteredRows
+        ( Array.append replacementRows filteredRows
+        , rowsRemoved
+        )
 
 
 getCell : Pos -> Board -> Maybe Cell
