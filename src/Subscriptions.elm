@@ -16,7 +16,7 @@ subscriptions model =
 
         Running _ ->
             Sub.batch
-                [ Time.every (Time.second * 0.5) (always Tick)
+                [ Time.every (Time.millisecond * toFloat (500 - model.speed)) (always Tick)
                 , Keyboard.downs moveBrick
                 , Keyboard.downs rotateBrick
                 ]

@@ -24,7 +24,10 @@ view model =
             [ div [ class "title" ]
                 [ text "Tetris" ]
             , div [ class "info-item status" ]
-                [ text <| "score: " ++ toString (GameState.score model.state) ]
+                [ text <| "score: " ++ toString (GameState.score model.state)
+                , br [] []
+                , text <| "speed: " ++ toString model.speed
+                ]
             , div [ class "info-item controls" ]
                 [ text "move: ⬅/➡/⬇"
                 , br [] []

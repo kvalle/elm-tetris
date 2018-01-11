@@ -47,11 +47,18 @@ update msg model =
                             model.board
                                 |> Board.addPiece model.piece
                                 |> Board.clearFullRows
+
+                        newSpeed =
+                            if numClearedRows > 0 then
+                                model.speed + 1
+                            else
+                                model.speed
                     in
                         ( { model
                             | board = newBoard
                             , piece = Piece.empty
                             , state = model.state |> GameState.addPoints (numClearedRows * numClearedRows)
+                            , speed = newSpeed
                           }
                         , Random.generate NewPiece Piece.random
                         )

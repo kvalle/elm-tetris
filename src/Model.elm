@@ -10,6 +10,7 @@ type alias Model =
     { board : Board
     , piece : Piece
     , state : GameState
+    , speed : Int
     }
 
 
@@ -18,6 +19,7 @@ init =
     ( { board = Board.empty
       , piece = Piece.empty
       , state = NotStarted
+      , speed = 1
       }
     , Cmd.none
     )
