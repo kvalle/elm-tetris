@@ -4,22 +4,7 @@ import Array exposing (Array)
 import Config
 import List.Nonempty exposing (Nonempty(..))
 import Random exposing (Generator)
-
-
-{-| Position as (col, row)
--}
-type alias Pos =
-    { row : Int, col : Int }
-
-
-mapRow : (Int -> Int) -> Pos -> Pos
-mapRow fn pos =
-    { pos | row = fn pos.row }
-
-
-mapCol : (Int -> Int) -> Pos -> Pos
-mapCol fn pos =
-    { pos | col = fn pos.col }
+import Types.Pos as Pos exposing (Pos)
 
 
 type alias Board =
@@ -229,13 +214,13 @@ move direction piece =
         fn =
             case direction of
                 Down ->
-                    mapRow <| (+) 1
+                    Pos.mapRow <| (+) 1
 
                 Left ->
-                    mapCol <| flip (-) 1
+                    Pos.mapCol <| flip (-) 1
 
                 Right ->
-                    mapCol <| (+) 1
+                    Pos.mapCol <| (+) 1
     in
         { piece | pos = fn piece.pos }
 
