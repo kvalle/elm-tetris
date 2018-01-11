@@ -1,6 +1,7 @@
 module Messages exposing (Msg(..))
 
-import Types exposing (Direction, Piece)
+import Types.Common exposing (Direction)
+import Types.Piece exposing (Piece)
 
 
 type Msg

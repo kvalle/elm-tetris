@@ -7,7 +7,8 @@ import Element
 import Color
 import Model exposing (Model)
 import Config
-import Types exposing (Color(..), Cell(..), GameState(..))
+import Types.Common exposing (Color(..), GameState(..))
+import Types.Board as Board exposing (Cell(..))
 
 
 view : Model -> Html msg
@@ -44,8 +45,8 @@ view model =
                 board : List Collage.Form
                 board =
                     model.board
-                        |> Types.addPiece model.piece
-                        |> Types.toPosList
+                        |> Board.addPiece model.piece
+                        |> Board.toPosList
                         |> List.map
                             (\( pos, cell ) ->
                                 Collage.square Config.pixelSize
