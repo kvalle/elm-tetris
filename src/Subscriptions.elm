@@ -28,7 +28,7 @@ subscriptions model =
 startGameOnSpace : Keyboard.KeyCode -> Msg
 startGameOnSpace keyCode =
     if keyCode == 32 then
-        StartGame
+        StartNewGame
     else
         NoOp
 

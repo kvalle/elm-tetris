@@ -6,8 +6,9 @@ import Types.Piece exposing (Piece)
 
 type Msg
     = NoOp
-    | StartGame
+    | StartNewGame
+    | NewGame Piece Piece
+    | NewPiece Piece
     | Tick
     | Move Direction
-    | NewPiece Piece
     | Rotate

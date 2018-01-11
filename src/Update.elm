@@ -16,17 +16,27 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        StartGame ->
+        NewGame currentPiece nextPiece ->
             ( { model
                 | state = Running 0
                 , board = Board.empty
+                , currentPiece = currentPiece
+                , nextPiece = nextPiece
               }
-            , Random.generate NewPiece Piece.random
+            , Cmd.none
+            )
+
+        StartNewGame ->
+            ( model
+            , Random.generate identity <|
+                Random.map2 NewGame
+                    Piece.random
+                    Piece.random
             )
 
         NewPiece piece ->
             ( if piece |> legalOn model.board then
-                { model | piece = piece }
+                { model | currentPiece = piece }
               else
                 { model | state = GameOver <| GameState.score model.state }
             , Cmd.none
@@ -35,17 +45,17 @@ update msg model =
         Tick ->
             let
                 movedPiece =
-                    Piece.move Down model.piece
+                    Piece.move Down model.currentPiece
             in
                 if movedPiece |> legalOn model.board then
-                    ( { model | piece = movedPiece }
+                    ( { model | currentPiece = movedPiece }
                     , Cmd.none
                     )
                 else
                     let
                         ( newBoard, numClearedRows ) =
                             model.board
-                                |> Board.addPiece model.piece
+                                |> Board.addPiece model.currentPiece
                                 |> Board.clearFullRows
 
                         newSpeed =
@@ -56,7 +66,7 @@ update msg model =
                     in
                         ( { model
                             | board = newBoard
-                            , piece = Piece.empty
+                            , currentPiece = Piece.empty
                             , state = model.state |> GameState.addPoints (numClearedRows * numClearedRows)
                             , speed = newSpeed
                           }
@@ -65,13 +75,15 @@ update msg model =
 
         Move direction ->
             ( { model
-                | piece = moveIfPossible direction model.board model.piece
+                | currentPiece = moveIfPossible direction model.board model.currentPiece
               }
             , Cmd.none
             )
 
         Rotate ->
-            ( { model | piece = rotateWherePossible model.board model.piece }
+            ( { model
+                | currentPiece = rotateWherePossible model.board model.currentPiece
+              }
             , Cmd.none
             )
 

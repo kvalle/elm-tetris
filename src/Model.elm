@@ -8,7 +8,8 @@ import Types.GameState exposing (GameState(..))
 
 type alias Model =
     { board : Board
-    , piece : Piece
+    , currentPiece : Piece
+    , nextPiece : Piece
     , state : GameState
     , speed : Int
     }
@@ -17,7 +18,8 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     ( { board = Board.empty
-      , piece = Piece.empty
+      , currentPiece = Piece.empty
+      , nextPiece = Piece.empty
       , state = NotStarted
       , speed = 1
       }

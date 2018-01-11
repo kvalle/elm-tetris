@@ -67,7 +67,7 @@ tetrisCanvas model =
 renderBoard : Model -> List Collage.Form
 renderBoard model =
     model.board
-        |> Board.addPiece model.piece
+        |> Board.addPiece model.currentPiece
         |> Board.toPosList
         |> List.map (uncurry renderCell)
 
