@@ -40,6 +40,8 @@ view model =
                 [ text "move: ⬅/➡/⬇"
                 , br [] []
                 , text "rotate: ⬆"
+                , br [] []
+                , text "drop: ENTER"
                 ]
             ]
         ]
