@@ -8,11 +8,12 @@ module Types.Board
         , toPosList
         , addPiece
         , legalOn
+        , moveToBottom
         )
 
 import Array exposing (Array)
 import Types.Pos exposing (Pos)
-import Types.Common exposing (Color(..))
+import Types.Common exposing (Color(..), Direction(..))
 import Types.Piece as Piece exposing (Piece)
 import Config
 
@@ -110,3 +111,11 @@ legalOn board piece =
             List.any (\pos -> (getCell pos board) /= Just Empty) (Piece.positions piece)
     in
         insideLeftEdge && insideRightEdge && aboveBottom && not collision
+
+
+moveToBottom : Board -> Piece -> Piece
+moveToBottom board piece =
+    if not <| legalOn board (Piece.move Down piece) then
+        piece
+    else
+        moveToBottom board (Piece.move Down piece)

@@ -27,6 +27,13 @@ update msg model =
             , Cmd.none
             )
 
+        Drop ->
+            ( { model
+                | currentPiece = Board.moveToBottom model.board model.currentPiece
+              }
+            , Cmd.none
+            )
+
         StartNewGame ->
             ( model
             , Random.generate identity <|

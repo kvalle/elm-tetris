@@ -110,21 +110,13 @@ renderBoard model =
                 []
             else
                 model.currentPiece
-                    |> moveToBottom model.board
+                    |> Board.moveToBottom model.board
                     |> Piece.positions
                     |> List.map (\pos -> ( pos, Filled model.currentPiece.color ))
                     |> List.map (uncurry renderCell)
                     |> List.map (Collage.alpha 0.1)
     in
         board ++ shadow ++ piece
-
-
-moveToBottom : Board -> Piece -> Piece
-moveToBottom board piece =
-    if not <| Board.legalOn board (Piece.move Down piece) then
-        piece
-    else
-        moveToBottom board (Piece.move Down piece)
 
 
 renderCell : Pos -> Cell -> Collage.Form

@@ -21,10 +21,19 @@ subscriptions model =
                     (always Tick)
                 , Keyboard.downs moveBrick
                 , Keyboard.downs rotateBrick
+                , Keyboard.downs dropPieceOnEnter
                 ]
 
         GameOver _ ->
             Keyboard.downs startGameOnSpace
+
+
+dropPieceOnEnter : Keyboard.KeyCode -> Msg
+dropPieceOnEnter keyCode =
+    if keyCode == 13 then
+        Drop
+    else
+        NoOp
 
 
 startGameOnSpace : Keyboard.KeyCode -> Msg

@@ -12,3 +12,4 @@ type Msg
     | Tick
     | Move Direction
     | Rotate
+    | Drop
