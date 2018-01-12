@@ -13,3 +13,5 @@ type Color
     | Red
     | Green
     | Purple
+    | Orange
+    | Gray

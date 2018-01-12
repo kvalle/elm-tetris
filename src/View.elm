@@ -127,6 +127,12 @@ cellColor cell =
         Filled Purple ->
             Color.purple
 
+        Filled Gray ->
+            Color.darkGray
+
+        Filled Orange ->
+            Color.orange
+
 
 toCanvasCoord : Pos -> ( Float, Float )
 toCanvasCoord pos =

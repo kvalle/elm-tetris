@@ -38,32 +38,50 @@ positions piece =
 pieces : Nonempty Piece
 pieces =
     let
-        theLongStrightOne =
+        theI =
             { color = Red
             , pos = { row = 1, col = Config.width // 2 }
             , blocks = [ ( -1, 0 ), ( 0, 0 ), ( 1, 0 ), ( 2, 0 ) ]
             }
 
-        theOneThatLooksLikeL =
+        theL =
             { color = Yellow
             , pos = { row = 1, col = Config.width // 2 }
             , blocks = [ ( -1, 0 ), ( 0, 0 ), ( 1, 0 ), ( 1, 1 ) ]
             }
 
-        theBackwardsL =
-            { color = Blue
+        theJ =
+            { color = Purple
             , pos = { row = 1, col = Config.width // 2 }
             , blocks = [ ( -1, 0 ), ( 0, 0 ), ( 1, 0 ), ( 1, -1 ) ]
             }
 
-        thePyramidThing =
+        theT =
             { color = Green
             , pos = { row = 1, col = Config.width // 2 }
             , blocks = [ ( -1, 0 ), ( 0, 0 ), ( 0, 1 ), ( 1, 0 ) ]
             }
+
+        theO =
+            { color = Blue
+            , pos = { row = 1, col = Config.width // 2 }
+            , blocks = [ ( -1, 0 ), ( -1, 1 ), ( 0, 0 ), ( 0, 1 ) ]
+            }
+
+        theS =
+            { color = Orange
+            , pos = { row = 1, col = Config.width // 2 }
+            , blocks = [ ( -1, 0 ), ( -1, 1 ), ( 0, -1 ), ( 0, 0 ) ]
+            }
+
+        theZ =
+            { color = Gray
+            , pos = { row = 1, col = Config.width // 2 }
+            , blocks = [ ( -1, -1 ), ( -1, 0 ), ( 0, 0 ), ( 0, 1 ) ]
+            }
     in
-        Nonempty theLongStrightOne
-            [ theOneThatLooksLikeL, theBackwardsL, thePyramidThing ]
+        Nonempty theI
+            [ theL, theJ, theT, theO, theS, theZ ]
 
 
 random : Generator Piece
