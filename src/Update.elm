@@ -19,6 +19,7 @@ update msg model =
         NewGame currentPiece nextPiece ->
             ( { model
                 | state = Running 0
+                , speed = 1
                 , board = Board.empty
                 , currentPiece = currentPiece
                 , nextPiece = nextPiece
