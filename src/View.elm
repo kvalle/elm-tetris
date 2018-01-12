@@ -8,7 +8,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Model exposing (Model)
 import Types.Board as Board exposing (Board, Cell(..))
-import Types.Common exposing (Color(..))
+import Types.Common exposing (Color(..), Direction(..))
 import Types.GameState as GameState exposing (GameState(..))
 import Types.Piece as Piece exposing (Piece)
 import Types.Pos as Pos exposing (Pos)
@@ -93,10 +93,38 @@ nextPieceCanvas piece =
 
 renderBoard : Model -> List Collage.Form
 renderBoard model =
-    model.board
-        |> Board.addPiece model.currentPiece
-        |> Board.toPosList
-        |> List.map (uncurry renderCell)
+    let
+        board =
+            model.board
+                |> Board.toPosList
+                |> List.map (uncurry renderCell)
+
+        piece =
+            model.currentPiece
+                |> Piece.positions
+                |> List.map (\pos -> ( pos, Filled model.currentPiece.color ))
+                |> List.map (uncurry renderCell)
+
+        shadow =
+            if Piece.isEmpty model.currentPiece then
+                []
+            else
+                model.currentPiece
+                    |> moveToBottom model.board
+                    |> Piece.positions
+                    |> List.map (\pos -> ( pos, Filled model.currentPiece.color ))
+                    |> List.map (uncurry renderCell)
+                    |> List.map (Collage.alpha 0.1)
+    in
+        board ++ shadow ++ piece
+
+
+moveToBottom : Board -> Piece -> Piece
+moveToBottom board piece =
+    if not <| Board.legalOn board (Piece.move Down piece) then
+        piece
+    else
+        moveToBottom board (Piece.move Down piece)
 
 
 renderCell : Pos -> Cell -> Collage.Form

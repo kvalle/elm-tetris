@@ -36,7 +36,7 @@ update msg model =
             )
 
         NewPiece piece ->
-            ( if piece |> legalOn model.board then
+            ( if piece |> Board.legalOn model.board then
                 { model
                     | currentPiece = model.nextPiece
                     , nextPiece = piece
@@ -53,7 +53,7 @@ update msg model =
                 movedPiece =
                     Piece.move Down model.currentPiece
             in
-                if movedPiece |> legalOn model.board then
+                if movedPiece |> Board.legalOn model.board then
                     ( { model | currentPiece = movedPiece }
                     , Cmd.none
                     )
@@ -94,31 +94,13 @@ update msg model =
             )
 
 
-legalOn : Board -> Piece -> Bool
-legalOn board piece =
-    let
-        insideLeftEdge =
-            List.all (\pos -> pos.col >= 0) (Piece.positions piece)
-
-        insideRightEdge =
-            List.all (\pos -> pos.col < Config.width) (Piece.positions piece)
-
-        aboveBottom =
-            List.all (\pos -> pos.row <= Config.height) (Piece.positions piece)
-
-        collision =
-            List.any (\pos -> (Board.getCell pos board) /= Just Empty) (Piece.positions piece)
-    in
-        insideLeftEdge && insideRightEdge && aboveBottom && not collision
-
-
 moveIfPossible : Direction -> Board -> Piece -> Piece
 moveIfPossible direction board piece =
     let
         movedPiece =
             Piece.move direction piece
     in
-        if movedPiece |> legalOn board then
+        if movedPiece |> Board.legalOn board then
             movedPiece
         else
             piece
@@ -140,6 +122,6 @@ rotateWherePossible board piece =
             ]
     in
         possiblePositions
-            |> List.filter (legalOn board)
+            |> List.filter (Board.legalOn board)
             |> List.head
             |> Maybe.withDefault piece

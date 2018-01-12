@@ -7,6 +7,7 @@ module Types.Board
         , getCell
         , toPosList
         , addPiece
+        , legalOn
         )
 
 import Array exposing (Array)
@@ -91,3 +92,21 @@ addPiece piece board =
         (\pos -> setCell pos <| Filled piece.color)
         board
         (Piece.positions piece)
+
+
+legalOn : Board -> Piece -> Bool
+legalOn board piece =
+    let
+        insideLeftEdge =
+            List.all (\pos -> pos.col >= 0) (Piece.positions piece)
+
+        insideRightEdge =
+            List.all (\pos -> pos.col < Config.width) (Piece.positions piece)
+
+        aboveBottom =
+            List.all (\pos -> pos.row <= Config.height) (Piece.positions piece)
+
+        collision =
+            List.any (\pos -> (getCell pos board) /= Just Empty) (Piece.positions piece)
+    in
+        insideLeftEdge && insideRightEdge && aboveBottom && not collision
