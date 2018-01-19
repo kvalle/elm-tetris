@@ -27,6 +27,20 @@ update msg model =
             , Cmd.none
             )
 
+        PauseGame ->
+            ( { model
+                | state = Paused <| GameState.score model.state
+              }
+            , Cmd.none
+            )
+
+        ResumeGame ->
+            ( { model
+                | state = Running <| GameState.score model.state
+              }
+            , Cmd.none
+            )
+
         Drop ->
             ( { model
                 | currentPiece = Board.moveToBottom model.board model.currentPiece

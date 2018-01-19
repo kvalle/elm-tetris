@@ -14,6 +14,9 @@ subscriptions model =
         NotStarted ->
             Keyboard.downs startGameOnSpace
 
+        Paused _ ->
+            Keyboard.downs resumeOnR
+
         Running _ ->
             Sub.batch
                 [ Time.every
@@ -22,10 +25,27 @@ subscriptions model =
                 , Keyboard.downs moveBrick
                 , Keyboard.downs rotateBrick
                 , Keyboard.downs dropPieceOnEnter
+                , Keyboard.downs pauseOnP
                 ]
 
         GameOver _ ->
             Keyboard.downs startGameOnSpace
+
+
+pauseOnP : Keyboard.KeyCode -> Msg
+pauseOnP keyCode =
+    if keyCode == 80 then
+        PauseGame
+    else
+        NoOp
+
+
+resumeOnR : Keyboard.KeyCode -> Msg
+resumeOnR keyCode =
+    if keyCode == 82 then
+        ResumeGame
+    else
+        NoOp
 
 
 dropPieceOnEnter : Keyboard.KeyCode -> Msg

@@ -42,6 +42,8 @@ view model =
                 , text "rotate: ⬆"
                 , br [] []
                 , text "drop: ENTER"
+                , br [] []
+                , text "pause: P"
                 ]
             ]
         ]
@@ -54,8 +56,14 @@ overlay state =
             div [ class "board-overlay" ]
                 [ text "press SPACE to begin" ]
 
-        GameOver _ ->
+        Paused _ ->
             div [ class "board-overlay" ]
+                [ h1 [] [ text "PAUSED" ]
+                , text "press R to resume"
+                ]
+
+        GameOver _ ->
+            div [ class "board-overlay board-overlay--transparent" ]
                 [ h1 [] [ text "GAME OVER" ]
                 , text "press SPACE for new game"
                 ]

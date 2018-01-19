@@ -13,3 +13,5 @@ type Msg
     | Move Direction
     | Rotate
     | Drop
+    | PauseGame
+    | ResumeGame

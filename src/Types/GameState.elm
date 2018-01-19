@@ -3,6 +3,7 @@ module Types.GameState exposing (GameState(..), score, addPoints)
 
 type GameState
     = NotStarted
+    | Paused Score
     | Running Score
     | GameOver Score
 
@@ -17,6 +18,9 @@ score state =
         NotStarted ->
             0
 
+        Paused score ->
+            score
+
         Running score ->
             score
 
@@ -29,6 +33,9 @@ addPoints n state =
     case state of
         NotStarted ->
             NotStarted
+
+        Paused score ->
+            Paused <| score + n
 
         Running score ->
             Running <| score + n
