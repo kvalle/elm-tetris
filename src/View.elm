@@ -60,6 +60,9 @@ overlay state =
             div [ class "board-overlay" ]
                 [ h1 [] [ text "PAUSED" ]
                 , text "press R to resume"
+                , br [] []
+                , br [] []
+                , text "press N for new game"
                 ]
 
         GameOver _ ->

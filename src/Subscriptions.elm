@@ -15,7 +15,10 @@ subscriptions model =
             Keyboard.downs startGameOnSpace
 
         Paused _ ->
-            Keyboard.downs resumeOnR
+            Sub.batch
+                [ Keyboard.downs resumeOnR
+                , Keyboard.downs newGameOnN
+                ]
 
         Running _ ->
             Sub.batch
@@ -59,6 +62,14 @@ dropPieceOnEnter keyCode =
 startGameOnSpace : Keyboard.KeyCode -> Msg
 startGameOnSpace keyCode =
     if keyCode == 32 then
+        StartNewGame
+    else
+        NoOp
+
+
+newGameOnN : Keyboard.KeyCode -> Msg
+newGameOnN keyCode =
+    if keyCode == 78 then
         StartNewGame
     else
         NoOp
